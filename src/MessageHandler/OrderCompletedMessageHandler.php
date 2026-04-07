@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MessageHandler;
 
 use App\Repository\ProductRepository;
+use App\Service\ProductPublisher;
 use App\SharedBundle\Message\OrderCompletedMessage;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -13,6 +14,7 @@ final readonly class OrderCompletedMessageHandler
 {
     public function __construct(
         private ProductRepository $productRepository,
+        private ProductPublisher $productPublisher,
     ) {
     }
 
@@ -31,5 +33,6 @@ final readonly class OrderCompletedMessageHandler
         $product->decreaseQuantity($message->quantityOrdered);
 
         $this->productRepository->save($product);
+        $this->productPublisher->publishUpdated($product);
     }
 }

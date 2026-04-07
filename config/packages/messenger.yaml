@@ -29,6 +29,7 @@ framework:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
             App\SharedBundle\Message\ProductCreatedMessage: product_events
+            App\SharedBundle\Message\ProductUpdatedMessage: product_events
 
 # when@test:
 #    framework:
