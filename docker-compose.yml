@@ -1,0 +1,48 @@
+services:
+  product-service:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: product-service
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: dev
+      APP_SECRET: dev-secret
+      DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
+      MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f/messages"
+    depends_on:
+      - product-db
+    volumes:
+      - ./:/app
+
+  product-consumer:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: product-consumer
+    environment:
+      APP_ENV: prod
+      APP_SECRET: dev-secret
+      DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
+      MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f"
+    depends_on:
+      - product-db
+    volumes:
+      - ./:/app
+    command: ["php", "bin/console", "messenger:consume", "order_events", "-vv"]
+
+  product-db:
+    image: postgres:16
+    container_name: product-db
+    environment:
+      POSTGRES_DB: product_service
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
+    ports:
+      - "5432:5432"
+    volumes:
+      - product_db_data:/var/lib/postgresql/data
+
+volumes:
+  product_db_data:
