@@ -11,10 +11,18 @@ services:
       APP_SECRET: dev-secret
       DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
       MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f/messages"
+      XDEBUG_MODE: debug,develop
+      XDEBUG_START_WITH_REQUEST: yes
+      XDEBUG_CLIENT_HOST: host.docker.internal
+      XDEBUG_CLIENT_PORT: 9003
+      XDEBUG_IDEKEY: PHPSTORM
+      PHP_IDE_CONFIG: "serverName=localhost"
     depends_on:
       - product-db
     volumes:
       - ./:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   product-consumer:
     build:
@@ -27,10 +35,18 @@ services:
       APP_SECRET: dev-secret
       DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
       MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f"
+      XDEBUG_MODE: debug,develop
+      XDEBUG_START_WITH_REQUEST: yes
+      XDEBUG_CLIENT_HOST: host.docker.internal
+      XDEBUG_CLIENT_PORT: 9003
+      XDEBUG_IDEKEY: PHPSTORM
+      PHP_IDE_CONFIG: "serverName=localhost"
     depends_on:
       - product-db
     volumes:
       - ./:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     command: ["php", "bin/console", "messenger:consume", "order_events", "-vv"]
 
   product-db:
