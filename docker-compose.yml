@@ -1,15 +1,15 @@
 services:
-  product-service:
+  eduki-service:
     build:
       context: .
       dockerfile: docker/Dockerfile
-    container_name: product-service
+    container_name: eduki-service
     ports:
       - "8000:8000"
     environment:
       APP_ENV: dev
       APP_SECRET: dev-secret
-      DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
+      DATABASE_URL: "postgresql://app:app@eduki-db:5432/eduki_service?serverVersion=16&charset=utf8"
       MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f/messages"
       XDEBUG_MODE: debug,develop
       XDEBUG_START_WITH_REQUEST: yes
@@ -18,48 +18,23 @@ services:
       XDEBUG_IDEKEY: PHPSTORM
       PHP_IDE_CONFIG: "serverName=localhost"
     depends_on:
-      - product-db
+      - eduki-db
     volumes:
       - ./:/app
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
-  product-consumer:
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
-    container_name: product-consumer
-    environment:
-      APP_ENV: dev
-      APP_DEBUG: 0
-      APP_SECRET: dev-secret
-      DATABASE_URL: "postgresql://app:app@product-db:5432/product_service?serverVersion=16&charset=utf8"
-      MESSENGER_TRANSPORT_DSN: "amqp://guest:guest@host.docker.internal:5672/%2f"
-      XDEBUG_MODE: debug,develop
-      XDEBUG_START_WITH_REQUEST: yes
-      XDEBUG_CLIENT_HOST: host.docker.internal
-      XDEBUG_CLIENT_PORT: 9003
-      XDEBUG_IDEKEY: PHPSTORM
-      PHP_IDE_CONFIG: "serverName=localhost"
-    depends_on:
-      - product-db
-    volumes:
-      - ./:/app
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
-    command: ["php", "bin/console", "messenger:consume", "order_events", "-vv"]
-
-  product-db:
+  eduki-db:
     image: postgres:16
-    container_name: product-db
+    container_name: eduki-db
     environment:
-      POSTGRES_DB: product_service
+      POSTGRES_DB: eduki_service
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
     ports:
       - "5432:5432"
     volumes:
-      - product_db_data:/var/lib/postgresql/data
+      - eduki_db_data:/var/lib/postgresql/data
 
 volumes:
-  product_db_data:
+  eduki_db_data:

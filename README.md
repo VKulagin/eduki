@@ -1,4 +1,4 @@
-# evotym_products
+# eduki
 
 **Start microservice_infra if it's not started yet with by running inside microservice_infra project:**
 
